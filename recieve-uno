@@ -1,0 +1,72 @@
+
+#include <SoftwareSerial.h>
+SoftwareSerial sendSerial(6,7);
+struct RxStruct {
+    char textB[16];        
+    int valC;               
+    unsigned long valD;    
+   
+                            
+                            
+};
+
+RxStruct rxData;
+
+bool newData = false;
+
+const byte startMarker = 255;
+const byte rxDataLen = sizeof(rxData);
+
+
+void setup() {
+    Serial.begin(9600);
+    Serial.println("\nStarting SerialStructReceive.ino\n");
+    sendSerial.begin(9600);
+
+}
+
+
+
+void loop() {
+
+    recvStructWithKnownLength();
+    if (newData == true) {
+        showNewData();
+        newData = false;
+    }
+}
+
+void showNewData() {
+
+    Serial.print("This just in    ");
+    Serial.print(rxData.textB);
+    Serial.print(' ');
+    Serial.print(rxData.valC);
+    Serial.print(' ');
+    Serial.println(rxData.valD);
+}
+
+
+void recvStructWithKnownLength() {
+    static byte recvData[rxDataLen];
+    byte rb;
+    byte * structStart;
+    structStart = reinterpret_cast <byte *> (&rxData);
+
+    if (sendSerial.available() >= rxDataLen + 1 and newData == false) {
+        rb = sendSerial.read();
+
+        if (rb == startMarker) {
+                // copy the bytes to the struct
+            for (byte n = 0; n < rxDataLen; n++) {
+                *(structStart + n) = sendSerial.read();
+            }
+                // make sure there is no garbage left in the buffer
+            while (sendSerial.available() > 0) {
+                byte dumpTheData = sendSerial.read();
+            }
+
+            newData = true;
+        }
+    }
+}
