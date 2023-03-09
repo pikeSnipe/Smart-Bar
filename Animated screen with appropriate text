@@ -1,0 +1,45 @@
+#include <UTFT.h>
+#include <URTouch.h>
+
+UTFT    myGLCD(ILI9486,38,39,40,41);
+URTouch  myTouch( 6, 5, 4, 3, 2);
+
+extern uint8_t BigFont[];
+
+void writeMessage()
+{
+  myGLCD.print("Exercise: Bench press", 10, 0);
+  myGLCD.print("Repetitions done: 16", 10, 30);
+  delay(2000);
+  myGLCD.clrScr();
+  myGLCD.print("Repetition 1: incorrect form", 10, 0);
+  myGLCD.print("Repetition 2: correct form", 10, 30);
+  myGLCD.print("Repetition 3: incorrect form", 10, 60);
+  myGLCD.print("Repetition 4: correct form", 10, 90);
+  myGLCD.print("Repetition 5: incorrect form", 10, 120);
+  myGLCD.print("Repetition 6: correct form", 10, 150);
+  myGLCD.print("Repetition 7: correct form", 10, 180);
+  myGLCD.print("Repetition 8: correct form", 10, 210);
+  delay(5000);
+  myGLCD.clrScr();
+  myGLCD.print("Repetition 9: incorrect form", 10, 0);
+  myGLCD.print("Repetition 10: correct form", 10, 30);
+  myGLCD.print("Repetition 11: incorrect form", 10, 60);
+  myGLCD.print("Repetition 12: correct form", 10, 90);
+  myGLCD.print("Repetition 13: incorrect form", 10, 120);
+  myGLCD.print("Repetition 14: correct form", 10, 150);
+  myGLCD.print("Repetition 15: correct form", 10, 180);
+  myGLCD.print("Repetition 16: correct form", 10, 210);
+}
+
+void setup()
+{
+  myGLCD.InitLCD();
+  myGLCD.clrScr();
+  myTouch.setPrecision(PREC_MEDIUM);
+  myGLCD.setFont(BigFont);
+  myGLCD.setBackColor(0, 0, 0);
+  writeMessage();  
+}
+
+void loop(){}
