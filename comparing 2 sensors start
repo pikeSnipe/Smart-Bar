@@ -1,0 +1,62 @@
+#include "Wire.h"
+#include <MPU6050_light.h>
+
+MPU6050 mpu(Wire);
+MPU6050 mpu1(Wire);
+long timer = 0;
+float razlika = 0;
+float X = 0;
+float X1 = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  
+  byte status = mpu.begin();
+  byte status1 = mpu1.begin();
+  Serial.print(F("MPU6050 status: "));
+  Serial.println(status);
+  Serial.print(F("MPU60501 status: "));
+  Serial.println(status1);
+  while(status!=0){ } // stop everything if could not connect to MPU6050
+  while(status1!=0){ }
+  
+  Serial.println(F("Calculating offsets, do not move MPU6050"));
+  delay(1000);
+  mpu.calcOffsets(true,true); // gyro and accelero
+  mpu1.calcOffsets(true,true);
+  Serial.println("Done!\n");
+
+  
+  
+}
+
+void loop() {
+  mpu.update();
+  mpu1.update();
+  if(millis() - timer > 1000){
+    Serial.print(F("\nACCELERO  X: "));Serial.print(mpu.getAccX());
+    X = mpu.getAccX();
+    //Serial.print("\tY: ");Serial.print(mpu.getAccY());
+    //Serial.print("\tZ: ");Serial.println(mpu.getAccZ());
+
+    Serial.print(F("\nACCELERO  X1: "));Serial.print(mpu1.getAccX());
+    X1 = mpu1.getAccX();
+    razlika = X - X1;
+    Serial.print(F("\nRazlika:"));Serial.print(razlika);
+   // Serial.print("\tY1: ");Serial.print(mpu1.getAccY());
+   // Serial.print("\tZ1: ");Serial.println(mpu1.getAccZ());
+  
+    /*Serial.print(F("GYRO      X: "));Serial.print(mpu.getGyroX());
+    Serial.print("\tY: ");Serial.print(mpu.getGyroY());
+    Serial.print("\tZ: ");Serial.println(mpu.getGyroZ());
+
+    Serial.print(F("GYRO      X1: "));Serial.print(mpu1.getGyroX());
+    Serial.print("\tY1: ");Serial.print(mpu1.getGyroY());
+    Serial.print("\tZ1: ");Serial.println(mpu1.getGyroZ());
+*/
+    //Serial.println(F("=====================================================\n"));
+    timer = millis();
+  }
+
+}
