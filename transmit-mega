@@ -1,0 +1,66 @@
+
+struct TxStruct {
+    char textA[16];         
+    int valA;               
+    unsigned long valB;                                                               
+};
+
+TxStruct txData = {"qwerty", 235, 0};
+
+bool newTxData = false;
+
+const byte startMarker = 255;
+const byte txDataLen = sizeof(txData);
+
+        // timing variables for sending frequency
+unsigned long prevUpdateTime = 0;
+unsigned long updateInterval = 500;
+void setup() {
+    Serial.begin(9600);
+    Serial.println("\nStarting SerialStructSend.ino\n");
+
+        // set up Serial for communication
+    Serial1.begin(9600); // to match SoftwareSerial on Uno
+
+}
+void loop() {
+
+        // this function updates the data in txData
+    updateDataToSend();
+        // this function sends the data if one is ready to be sent
+    transmitData();
+}
+void updateDataToSend() {
+
+    if (millis() - prevUpdateTime >= updateInterval) {
+        prevUpdateTime = millis();
+        if (newTxData == false) { // ensure previous message has been sent
+
+            char sText[] = "SendA";
+            strcpy(txData.textA, sText);
+            txData.valA += 10;
+            if (txData.valA > 300) {
+                txData.valA = 235;
+            }
+            txData.valB = millis();
+            newTxData = true;
+        }
+    }
+}
+void transmitData() {
+
+    if (newTxData == true) {
+        Serial1.write(startMarker);
+        Serial1.write((byte*) &txData, txDataLen);
+
+            // for demo show the data that as been sent
+        Serial.print("Sent ");
+        Serial.print(txData.textA);
+        Serial.print(' ');
+        Serial.print(txData.valA);
+        Serial.print(' ');
+        Serial.println(txData.valB);
+
+        newTxData = false;
+    }
+}
