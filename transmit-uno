@@ -1,0 +1,50 @@
+#include <SoftwareSerial.h>
+SoftwareSerial sendSerial(6,7);
+struct TxStruct {
+    char textA[16];        
+    int valA;               
+    unsigned long valB;                                    
+};
+TxStruct txData = {"xxx", 235, 0};
+bool newTxData = false;
+const byte startMarker = 255;
+const byte txDataLen = sizeof(txData);
+unsigned long prevUpdateTime = 0;
+unsigned long updateInterval = 500;
+void setup() {
+    Serial.begin(9600);
+    Serial.println("\nStarting SerialStructSend.ino\n");
+    sendSerial.begin(9600);
+}
+void loop() {
+    updateDataToSend();
+    transmitData();
+}
+void updateDataToSend() {
+    if (millis() - prevUpdateTime >= updateInterval) {
+        prevUpdateTime = millis();
+        if (newTxData == false) { 
+            char sText[] = "SendA";
+            strcpy(txData.textA, sText);
+            txData.valA += 10;
+            if (txData.valA > 300) {
+                txData.valA = 235;
+            }
+            txData.valB = millis();
+            newTxData = true;
+        }
+    }
+}
+void transmitData() {
+    if (newTxData == true) {
+        sendSerial.write(startMarker);
+        sendSerial.write((byte*) &txData, txDataLen);
+        Serial.print("Sent ");
+        Serial.print(txData.textA);
+        Serial.print(' ');
+        Serial.print(txData.valA);
+        Serial.print(' ');
+        Serial.println(txData.valB);
+        newTxData = false;
+    }
+}
